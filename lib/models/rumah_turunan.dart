@@ -3,37 +3,25 @@ import 'rumah.dart';
 
 // Kelas turunan untuk rumah tinggal
 class RumahTinggal extends Rumah {
-  bool _halamanBelakang;
-  bool _garasi;
+  final bool _halamanBelakang;
+  final bool _garasi;
 
   RumahTinggal({
-    required String id,
-    required String jenisRumah,
-    required String jenisRumah1,
-    required double luasTanah,
-    required double luasBangunan,
-    required int jumlahKamarTidur,
-    required int jumlahKamarMandi,
-    required int harga,
-    required String alamat,
-    required String gambar,
+    required super.id,
+    required super.jenisRumah,
+    required super.jenisRumah1,
+    required super.luasTanah,
+    required super.luasBangunan,
+    required super.jumlahKamarTidur,
+    required super.jumlahKamarMandi,
+    required super.harga,
+    required super.alamat,
+    required super.gambar,
     required bool halamanBelakang,
     required bool garasi,
   }) : _halamanBelakang = halamanBelakang,
        _garasi = garasi,
-       super(
-         id: id,
-         jenisRumah: jenisRumah,
-         jenisRumah1: jenisRumah1,
-         tipe: 'Rumah Tinggal',
-         luasTanah: luasTanah,
-         luasBangunan: luasBangunan,
-         jumlahKamarTidur: jumlahKamarTidur,
-         jumlahKamarMandi: jumlahKamarMandi,
-         harga: harga,
-         alamat: alamat,
-         gambar: gambar,
-       );
+       super(tipe: 'Rumah Tinggal');
 
   // Getter tambahan
   bool get halamanBelakang => _halamanBelakang;
@@ -51,37 +39,25 @@ class RumahTinggal extends Rumah {
 
 // Kelas turunan untuk rumah komersial
 class RumahKomersial extends Rumah {
-  String _jenisUsaha;
-  int _jumlahLantai;
+  final String _jenisUsaha;
+  final int _jumlahLantai;
 
   RumahKomersial({
-    required String id,
-    required String jenisRumah,
-    required String jenisRumah1,
-    required double luasTanah,
-    required double luasBangunan,
-    required int jumlahKamarTidur,
-    required int jumlahKamarMandi,
-    required int harga,
-    required String alamat,
-    required String gambar,
+    required super.id,
+    required super.jenisRumah,
+    required super.jenisRumah1,
+    required super.luasTanah,
+    required super.luasBangunan,
+    required super.jumlahKamarTidur,
+    required super.jumlahKamarMandi,
+    required super.harga,
+    required super.alamat,
+    required super.gambar,
     required String jenisUsaha,
     required int jumlahLantai,
   }) : _jenisUsaha = jenisUsaha,
        _jumlahLantai = jumlahLantai,
-       super(
-         id: id,
-         jenisRumah: jenisRumah,
-         jenisRumah1: jenisRumah1,
-         tipe: 'Rumah Komersial',
-         luasTanah: luasTanah,
-         luasBangunan: luasBangunan,
-         jumlahKamarTidur: jumlahKamarTidur,
-         jumlahKamarMandi: jumlahKamarMandi,
-         harga: harga,
-         alamat: alamat,
-         gambar: gambar,
-       );
+       super(tipe: 'Rumah Komersial');
 
   // Getter tambahan
   String get jenisUsaha => _jenisUsaha;

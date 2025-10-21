@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:my_project/services/notification_service.dart';
+import 'package:flutter_rating/flutter_rating.dart';
 
-class Pembelian extends StatelessWidget{
-  const Pembelian ({Key? key}) : super (key : key);
+class Pembelian extends StatefulWidget {
+  const Pembelian({super.key});
 
   @override
-  Widget build (BuildContext  context) {
+  State<Pembelian> createState() => _PembelianState();
+}
+
+class _PembelianState extends State<Pembelian> {
+
+  double _rating = 0.0;
+  final int _starCount = 5;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pembelian Rumah"),
@@ -18,15 +29,15 @@ class Pembelian extends StatelessWidget{
             // Data Unit Section
             _buildDataUnitSection(),
             const SizedBox(height: 24),
-            
+
             // Rincian Harga Section
             _buildRincianHargaSection(),
             const SizedBox(height: 24),
-            
+
             // Rincian Pembayaran Section
             _buildRincianPembayaranSection(),
             const SizedBox(height: 32),
-            
+
             // Tombol Konfirmasi
             _buildKonfirmasiButton(context),
           ],
@@ -84,11 +95,7 @@ class Pembelian extends StatelessWidget{
             _buildInfoRow('Harga Unit', 'Rp 750.000.000'),
             _buildInfoRow('PPN (11%)', 'Rp 82.500.000'),
             const Divider(thickness: 2),
-            _buildInfoRow(
-              'Total Harga Jual', 
-              'Rp 832.500.000',
-              isTotal: true,
-            ),
+            _buildInfoRow('Total Harga Jual', 'Rp 832.500.000', isTotal: true),
           ],
         ),
       ),
@@ -150,40 +157,109 @@ class Pembelian extends StatelessWidget{
     );
   }
 
+  // untuk menampilkan dialog rating
+  void _showRatingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Mencegah dialog tertutup saat klik di luar
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Beri Rating'),
+          content: Column(
+            // Agar ukuran dialog menyesuaikan isinya
+            mainAxisSize: MainAxisSize.min, 
+            children: [
+              const Text('Bagaimana pengalaman Anda dalam melakukan pembelian?'),
+              const SizedBox(height: 20),
+              // Gunakan variabel state _rating dan _starCount
+              StarRating(
+                size: 40.0,
+                rating: _rating,
+                color: Colors.orange,
+                borderColor: Colors.grey,
+                allowHalfRating: true,
+                starCount: _starCount,
+                onRatingChanged: (rating) => setState(() {
+                  _rating = rating; // Perbarui state saat rating berubah
+                }),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Tutup dialog dan kembali ke halaman home
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: const Text('Lewati'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: Di sini Anda bisa menambahkan logika untuk menyimpan rating ke server/database
+                // Contoh: print('Rating yang dikirim: $_rating');
+                
+                // Tutup dialog dan kembali ke halaman home
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: const Text('Kirim'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildKonfirmasiButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          showDialog(
+        onPressed: () async {
+           // 1. Tampilkan dialog konfirmasi dan tunggu hasilnya
+          final bool? shouldProceed = await showDialog<bool>(
             context: context,
-            builder: (BuildContext context) {
+            builder: (BuildContext dialogContext) {
               return AlertDialog(
                 title: const Text('Konfirmasi Pembelian'),
-                content: const Text('Apakah Anda yakin ingin melanjutkan pembelian rumah ini?'),
+                content: const Text(
+                  'Apakah Anda yakin ingin melanjutkan pembelian rumah ini?',
+                ),
                 actions: [
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
+                     // Kembalikan nilai false jika batal
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
                     child: const Text('Batal'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Pembelian berhasil dikonfirmasi!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    },
+                    // Kembalikan nilai true jika konfirmasi
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
                     child: const Text('Konfirmasi'),
                   ),
                 ],
-              );
+              );      
             },
-          );
+          );      
+          // 2. Jika pengguna menekan 'Konfirmasi' (shouldProceed adalah true)
+          if (shouldProceed == true) {
+            // Kirim notifikasi ke server
+            final success = await NotificationService().addNotificationWithFeedback(
+              // Gunakan 'context' dari build method, yang masih valid
+              context: context, 
+              title: 'Pembelian Berhasil',
+              message: 'Pembelian rumah Anda telah berhasil dikonfirmasi. Silakan lanjut ke proses selanjutnya.',
+            );
+             // Jika penyimpanan notifikasi berhasil, tampilkan snackbar sukses pembelian
+            if (success) {
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(
+                   content: Text('Pembelian berhasil dikonfirmasi!'),
+                   backgroundColor: Colors.green,
+                 ),
+               );
+             }        
+            // 3. Tampilkan dialog rating menggunakan 'context' yang valid
+            _showRatingDialog(context);
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue[700],

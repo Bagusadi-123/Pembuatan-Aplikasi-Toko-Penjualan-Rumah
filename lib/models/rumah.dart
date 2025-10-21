@@ -1,16 +1,16 @@
 // models/rumah.dart
 class Rumah {
-  String _id;
-  String _jenisRumah;
-  String _jenisRumah1;
-  String _tipe;
-  double _luasTanah;
-  double _luasBangunan;
-  int _jumlahKamarTidur;
-  int _jumlahKamarMandi;
-  int _harga;
-  String _alamat;
-  String _gambar;
+  final String _id;
+  final String _jenisRumah;
+  final String _jenisRumah1;
+  final String _tipe;
+  final double _luasTanah;
+  final double _luasBangunan;
+  final int _jumlahKamarTidur;
+  final int _jumlahKamarMandi;
+  final int _harga;
+  final String _alamat;
+  final String _gambar;
 
   Rumah({
     required String id,

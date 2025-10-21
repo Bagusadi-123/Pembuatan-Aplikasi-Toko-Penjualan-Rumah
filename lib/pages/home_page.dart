@@ -7,11 +7,46 @@ import 'package:my_project/pages/profile_page.dart'; // Import halaman profile
 import 'package:my_project/pages/rumah_list_page.dart';
 import 'package:my_project/services/rumah_service.dart';
 import 'package:my_project/widgets/rumah_card.dart';
+import 'package:my_project/services/notification_service.dart'; // Import layanan
+import 'package:badges/badges.dart' as badges;
+import 'package:my_project/pages/notification_page.dart';
 
 import '../models/rumah.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _unreadCount = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+     // DAFTARKAN fungsi _loadUnreadCount ke dalam callback NotificationService
+    NotificationService.onNotificationAdded = _loadUnreadCount;
+    _loadUnreadCount();
+  }
+
+  @override
+  void dispose() {
+    // PENTING: Lepaskan pendaftaran saat widget dihancurkan untuk mencegah memory leak
+    NotificationService.onNotificationAdded = null;
+    super.dispose();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    // GANTI dengan fungsi baru
+    final count = await NotificationService().getUnreadCountWithFeedback(context: context);
+    setState(() {
+      _unreadCount = count;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +58,57 @@ class HomePage extends StatelessWidget {
         title: const Text('Toko Penjualan Rumah'),
         automaticallyImplyLeading: false,
         actions: [
+          // Tambahkan notifikasi badge dengan angka
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : badges.Badge(
+                    position: badges.BadgePosition.topEnd(top: -8, end: -4),
+                    showBadge: _unreadCount > 0,
+                    ignorePointer: false,
+                    badgeContent: Text(
+                      _unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                    badgeAnimation: badges.BadgeAnimation.rotation(
+                      animationDuration: const Duration(seconds: 1),
+                      colorChangeAnimationDuration: const Duration(seconds: 1),
+                      loopAnimation: false,
+                      curve: Curves.fastOutSlowIn,
+                      colorChangeAnimationCurve: Curves.easeInCubic,
+                    ),
+                    badgeStyle: badges.BadgeStyle(
+                      shape: badges.BadgeShape.circle,
+                      badgeColor: Colors.red,
+                      padding: const EdgeInsets.all(5),
+                      borderSide: const BorderSide(color: Colors.white, width: 2),
+                      elevation: 0,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.notifications),
+                      onPressed: () async {
+                        // Navigasi ke halaman notifikasi
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => const NotificationPage()),
+                        );
+                        // Setelah kembali dari halaman notifikasi, refresh badge
+                        _loadUnreadCount();
+                      },
+                    ),
+                  ),
+          ),
+
           // Tambahkan logo/profile di pojok kanan atas
           Padding(
             padding: const EdgeInsets.only(right: 16.0),

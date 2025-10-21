@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToLogin() {
-    Future.delayed(const Duration(seconds: 60), () {
+    Future.delayed(const Duration(seconds: 7), () {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/login');
       }

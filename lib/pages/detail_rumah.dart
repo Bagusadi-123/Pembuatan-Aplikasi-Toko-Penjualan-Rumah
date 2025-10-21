@@ -7,8 +7,7 @@ class DetailRumah extends StatelessWidget {
   final Rumah rumah;
   final RumahTinggal? rumahTinggal; // Ubah menjadi nullable
 
-  const DetailRumah({Key? key, required this.rumah, this.rumahTinggal})
-    : super(key: key);
+  const DetailRumah({super.key, required this.rumah, this.rumahTinggal});
 
   @override
   Widget build(BuildContext context) {

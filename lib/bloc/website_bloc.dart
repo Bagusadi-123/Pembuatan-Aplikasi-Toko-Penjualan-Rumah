@@ -40,7 +40,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       await Future<void>.delayed(const Duration(seconds: 2));
 
       // Simulasi logika validasi
-      if (state.email == '' && state.password == '') {
+      if (state.email == 'aku' && state.password == 'rahasia') {
         // 2. Jika berhasil, emit state 'success'
         emit(state.copyWith(status: LoginStatus.succes));
       } else {
